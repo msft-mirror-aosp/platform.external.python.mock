@@ -1,3 +1,2 @@
 include LICENSE.txt
 include *.rst
-recursive-include mock/tests *.py

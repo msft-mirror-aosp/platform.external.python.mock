@@ -25,8 +25,6 @@ Python Version Compatibility
 
 * Version 2.0.0 is the last version offering official Jython support.
 
-* version 3.0.5 is the last version supporting Python 3.5 and lower.
-
 .. index:: installing
 .. _installing:
 
@@ -79,6 +77,9 @@ Checkout from git (see :ref:`installing`) and submit pull requests.
 Committers can just push as desired: since all semantic development takes
 place in cPython, the backport process is as lightweight as we can make it.
 
+mock is CI tested using Travis-CI on Python versions 2.7, 3.4,
+3.5, 3.6, pypy, pypy3.
+
 If you end up fixing anything backport-specific, please add an entry
 to the top of ``CHANGELOG.rst`` so it shows up in the next release
 notes.
@@ -103,6 +104,17 @@ non-bugfix changes, patch on bugfix only changes.
 Backporting rules
 -----------------
 
+- ``isinstance`` checks in cPython to ``type`` need to check ``ClassTypes``.
+  Code calling ``obj.isidentifier`` needs to change to ``_isidentifier(obj)``.
+
+- f-strings need to be rewritten using some other string substitution.
+
+- ``assertRaisesRegex`` needs to be ``assertRaisesRegexp`` for Python 2.
+
+- If test code won't compile on a particular version of Python, move it to
+  a matching ``_py{version}.py`` file. If ``{version}`` isn't 3, adjust
+  ``conftest.py``.
+
 - If code such as this causes coverage checking to drop below 100%:
 
   .. code-block:: python
@@ -117,20 +129,6 @@ Backporting rules
 
       def will_never_be_called(): pass
 
-- If code such as this causes coverage checking to drop below 100%:
-
-  .. code-block:: python
-
-      def will_never_be_called():
-          yield
-
-  It should be adjusted to the following pattern, preferably upstream,
-  so that the ``.coveragerc`` in this repo knows to ignore it:
-
-  .. code-block:: python
-
-      def will_never_be_called(): yield
-
 Backporting process
 -------------------
 
@@ -143,7 +141,7 @@ Backporting process
        git clone https://github.com/python/cpython.git
        git clone https://github.com/testing-cabal/mock.git
 
-   Make sure they are both on master and up to date!
+   Make sure they both on master and up to date!
 
 2. Create a branch in your ``mock`` clone and switch to it.
 
@@ -179,25 +177,5 @@ Backporting process
 
 5. Rinse and repeat until ``backport.py`` reports no more patches need applying.
 
-6. If ``backport.py`` has updated ``lastsync.txt`` but not committed it,
-   now would be a good time to commit that change.
-
-Checking coverage in upstream
------------------------------
-
-Assuming you have the checkout structure as above, and you have compiled your cpython
-master branch, then roughly as follows:
-
-.. code-block:: bash
-
-   ~/vcs/cpython/python.exe -m venv ~/virtualenvs/cpython-master
-   source ~/virtualenvs/cpython-master/bin/activate
-   pip install -U setuptools pip
-   pip install pytest pytest-cov
-   cd vcs/cpython/Lib/unittest
-   pytest --cov unittest.mock --cov unittest.test.testmock \
-          --cov-config ~/vcs/git/mock/.coveragerc \
-          --cov-report term-missing:skip-covered \
-          test/testmock/test*
-
-Ignore ``test/testmock/__*__.py`` as these aren't present in the backport.
+6. If ``backport.py`` has updated ``lastsync.txt``, now would be a good time
+   to commit that change.
