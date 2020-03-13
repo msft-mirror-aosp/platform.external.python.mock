@@ -1,5 +1,9 @@
 name: "mock"
-description: "mock is a library for testing in Python. It allows you to replace parts of your system under test with mock objects and make assertions about how they have been used."
+description:
+    "mock is a library for testing in Python. It allows you to replace parts of "
+    "your system under test with mock objects and make assertions about how "
+    "they have been used."
+
 third_party {
   url {
     type: HOMEPAGE
@@ -9,11 +13,7 @@ third_party {
     type: GIT
     value: "https://github.com/testing-cabal/mock"
   }
-  version: "4.0.2"
+  version: "2.0.0"
+  last_upgrade_date { year: 2018 month: 8 day: 1 }
   license_type: NOTICE
-  last_upgrade_date {
-    year: 2020
-    month: 3
-    day: 11
-  }
 }
