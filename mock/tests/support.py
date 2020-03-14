@@ -1,6 +1,7 @@
 import contextlib
 import sys
 
+
 target = {'foo': 'FOO'}
 
 
@@ -28,7 +29,9 @@ def uncache(*names):
 
     """
     for name in names:
-        assert name not in ('sys', 'marshal', 'imp')
+        if name in ('sys', 'marshal', 'imp'):
+            raise ValueError(
+                "cannot uncache {0}".format(name))
         try:
             del sys.modules[name]
         except KeyError:
@@ -37,16 +40,7 @@ def uncache(*names):
         yield
     finally:
         for name in names:
-            del sys.modules[name]
-
-
-class _ALWAYS_EQ:
-    """
-    Object that is equal to anything.
-    """
-    def __eq__(self, other):
-        return True
-    def __ne__(self, other):
-        return False
-
-ALWAYS_EQ = _ALWAYS_EQ()
+            try:
+                del sys.modules[name]
+            except KeyError:
+                pass
