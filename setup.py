@@ -1,10 +1,6 @@
-import re
-from os.path import join
-
+#!/usr/bin/env python
 import setuptools
 
 setuptools.setup(
-    version=re.search("__version__ = '([^']+)'",
-                      open(join('mock', 'mock.py')).read()).group(1),
-    long_description=open('README.rst').read(),
-)
+    setup_requires=['pbr>=1.3', 'setuptools>=17.1'],
+    pbr=True)
